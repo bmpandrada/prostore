@@ -141,6 +141,87 @@ export async function getLatestProducts() {
     return   convertToPlainObject(data);
  }
 
+
+ZOD --> 
+Ginagamit ang Zod kapag gusto mong:
+Siguraduhin na tama ang format ng data na nanggaling sa form, API, database, atbp.
+Mag-validate ng input ng user (halimbawa: email, age, etc.)
+I-define ang expected na structure ng data at awtomatikong makuha ang TypeScript type
+Protektahan ang system mo sa maling data
+
+1. create a file 'types' in the root folder
+2. inside the types folder put index.ts
+
+import { insertProductScheme } from "@/lib/validator";
+import { z } from "zod";
+
+export type Product = z.infer<typeof insertProductScheme> & { // Extending the Product type with additional properties
+    id: string;
+    rating: string;
+    createdAt: Date;
+
+}
+
+2. install zod 'npm i zod'
+3. create validator inside of lib name it validators.ts
+import { z } from "zod";
+import { formatNumberWithDecimal } from "./utils";
+
+const currency =  z
+    .string()
+    .refine((value)=> /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+    'Price must be a valid number with two decimal places');
+
+//Schema for inserting products
+export const insertProductScheme = z.object({
+    name: z.string().min(3, 'Name must be at least 3 characters long'),
+    slug: z.string().min(3, 'Slug must be at least 3 characters long'),
+    category: z.string().min(3, 'Category must be at least 3 characters long'),
+    brand: z.string().min(3, 'Brand must be at least 3 characters long'),
+    description: z.string().optional(),
+    stock: z.coerce.number(),
+    images: z.array(z.string()).min(1, 'Product must have at least one image'),
+    isFeatured: z.boolean(),
+    banner: z.string().nullable(),
+    price: currency,
+})
+
+now use it:
+import { Product } from "@/types";
+const ProductCard = ({ product }: {product: Product}) => ...
+
+
+
+-> 3 thing to install for Serveless Environment Config
+
+1. npm install @neondatabase/serverless @prisma/adapter-neon ws
+2. npm i -D @types/ws bufferutil
+3. go to prisma add one line of code for use of adapter
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma" < -- removed
+  previewFeatures = ["driverAdapters"]  <--- add
+}
+
+4. run npx prisma generate
+
+5. 
+'use server';
+import { prisma } from '@/db/prisma'; 
+import { convertToPlainObject } from "../utils";
+import { LATEST_PRODUCTS_LIMIT } from "../constants";
+
+//get latest products
+export async function getLatestProducts() { 
+
+    const data = await prisma.product.findMany({
+        take: LATEST_PRODUCTS_LIMIT,
+        orderBy: { createdAt: 'desc' },
+    });
+
+    return   convertToPlainObject(data);
+ }
 ``
 
 
@@ -164,4 +245,3 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# prostore
