@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  // output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  // @id	Makes the field the primary key
+  // @default(dbgenerated("gen_random_uuid()"))	Uses Postgres function to generate the ID
+  // @db.Uuid	Makes sure it's treated as a UUID in the DB
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  // sql
+  // slug String	Gumawa ng text field na slug
+  // @unique	Dapat walang duplicate ang value ng slug
+  // map: "products_slug_idx"	Pinangalanan mo yung uniqueness rule sa database
+  // CREATE UNIQUE INDEX products_slug_idx ON Product(slug);
+  slug        String   @unique(map: "products_slug_idx")
+  category    String
+  description String?
+  images      String[]
+  price       Decimal  @default(0) @db.Decimal(12, 2)
+  brand       String
+  rating      Decimal  @default(0) @db.Decimal(3, 2)
+  numReviews  Int      @default(0)
+  stock       Int
+  isFeatured  Boolean
+  banner      String?
+  // createdAt DateTime	Gumawa ng field para sa petsa at oras
+  // @default(now())	Automatic na ilalagay ang current time kapag nag-save ng record
+  // @db.Timestamp(6)	Gamitin ang high-precision TIMESTAMP(6) sa database
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
