@@ -11,6 +11,12 @@ export async function getLatestProducts() {
         take: LATEST_PRODUCTS_LIMIT,
         orderBy: { createdAt: 'desc' },
     });
-
     return   convertToPlainObject(data);
+ }
+
+ // get product by slug
+ export async function getProductBySlug(slug: string) {
+    return await prisma.product.findFirst({
+        where: { slug: slug},
+    })
  }
