@@ -1,13 +1,13 @@
 import { Product } from "@/types";
 import ProductCard from "./product-card";   
 
-interface ProductListProps {
-  data: Product[];
-  title?: string;
-  limit?: number;
-}
+// interface ProductListProps {
+//   data: Product[];
+//   title?: string;
+//   limit?: number;
+// }
 
-const ProductList = ({ data, title, limit }: ProductListProps) => {
+const ProductList = ({ data, title, limit }: {data: Product[]; title?: string; limit?: number}) => {
     const limitedData = limit ? data.slice(0, limit) : data;
     return ( 
         <div className="my-10">

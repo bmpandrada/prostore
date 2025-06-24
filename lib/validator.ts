@@ -12,7 +12,7 @@ export const insertProductScheme = z.object({
     slug: z.string().min(3, 'Slug must be at least 3 characters long'),
     category: z.string().min(3, 'Category must be at least 3 characters long'),
     brand: z.string().min(3, 'Brand must be at least 3 characters long'),
-    description: z.string().optional(),
+    description: z.string().optional().nullable(),
     stock: z.coerce.number(),
     images: z.array(z.string()).min(1, 'Product must have at least one image'),
     isFeatured: z.boolean(),
